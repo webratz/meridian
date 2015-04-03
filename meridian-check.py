@@ -18,20 +18,68 @@ from time import sleep
 from mailer import Mailer
 from mailer import Message
 
-debug = True
+debug = False
 
+
+class MeridianConfig(object):
+  """
+  set some common configs
+  """
+  def __init__(self, mail_from, mail_to, mail_server, loop_sleep=5):
+    self.mail_from   = mail_from          # from mail address
+    self.mail_to     = mail_to            # destination mail address, use a list for multiple
+    self.mail_server = mail_server        # smtp mail server
+    self.loop_sleep  = loop_sleep         # minutes
+    
+class MeridianAnnoucement(object):
+  """
+  we don't know if there could be multiple announcements
+  currently we only expect one, and will fail on multiple announces
+  """
+  def __init__(self):
+    self.url              = 'http://www.der-meridian.de/announcements.json'
+    self.announcements    = None
+    self.aid              = 0 # Announcement ID parsed from json
+      
+  def get_announce(self):
+    try:
+      r = requests.get(self.url)
+      if r.status_code == 200:
+        self.announcements = r.json()
+        if debug:
+          print self.announcements
+    except:
+      raise
+
+  def need_notify(self):
+      a = self.announcements
+      if int(a['id']) > self.aid:
+        self.send_notification(a)
+        pass
+      self.aid = int(a['id'])
+
+
+  def send_notification(self, data):
+    """
+    expects an Announcement
+    """
+    body = BeautifulSoup(data['body']).text.encode("utf-8")
+    message = Message(From    = mc.mail_from,
+                      To      = mc.mail_to,
+                      charset = "utf-8")
+    message.Subject = "Info: %s" % data['title'].encode('latin-1')
+    message.Body    = "Info:\n %s \n" % (body) 
+
+    sender = Mailer(mc.mail_server)
+    sender.send(message)
 
 class MeridianStrecke(object):
   def __init__(self):
     self.url                = 'http://www.der-meridian.de/strecken-fahrplaene/linie/1-munchen-hbf-rosenheim-salzburg-hbf'
-    self.config_mail_from   = 'no-reply@configure.me'       # from mail address
-    self.config_mail_to     = 'changeme'                    # desitnation mail address, use a list for multiple
-    self.config_mail_server = 'use your smtp server'        # smtp mail server
-    self.config_loop_sleep  = 5                             # minutes
-    self.soup               = None
     self.incidents          = []
     self.construction       = []
     self.last_updated       = None  # current value
+    self.soup               = None
     
   def get_html(self):
     """
@@ -98,7 +146,7 @@ class MeridianStrecke(object):
     check if we should send out an notification
     """
     for i in self.incidents:
-      old = datetime.now() - timedelta(minutes=self.config_loop_sleep) # there may be cases where this is not matching
+      old = datetime.now() - timedelta(minutes=mc.loop_sleep) # there may be cases where this is not matching
       if i['updated'] > old:
         self.send_notification(i)
       if debug:
@@ -107,25 +155,33 @@ class MeridianStrecke(object):
 
   def send_notification(self, data):
     """
-    expects an icident dict
+    expects an incident dict
     """
     text = "Meldung: %s \nStand: %s\nQuelle: %s" % (data['text'], data['updated'], self.url) 
-    message = Message(From    = self.config_mail_from,
-                      To      = self.config_mail_to,
+    message = Message(From    = mc.mail_from,
+                      To      = mc.mail_to,
                       charset = "utf-8")
     message.Subject = "Störungsmeldung: %s" % data['title']
     message.Body    = text
 
-    sender = Mailer(self.config_mail_server)
+    sender = Mailer(mc.mail_server)
     sender.send(message)
     
+
+# global
+
 def loop():
   # main loop
   while True:
     try:
+      # incidents
       ms.get_incidents()
       ms.need_notify()
-      # only check every X minutes
+      
+      # announcements
+      ma.get_announce()
+      ma.need_notify()
+      
       if debug:
         print "check"
     except:
@@ -133,15 +189,21 @@ def loop():
         raise
       pass
     
-    sleep(ms.config_loop_sleep * 60)
+    sleep(mc.loop_sleep * 60)
 
 
-# start and configure
+# configure
+mc = MeridianConfig(
+  mail_from   = '',
+  mail_to     = '',
+  mail_server = '',
+  )
+
+# instantiate classes and cofigure
 ms = MeridianStrecke()
-# config hints in class init
-ms.url                = 'http://www.der-meridian.de/strecken-fahrplaene/linie/1-munchen-hbf-rosenheim-salzburg-hbf'
-ms.config_mail_from   = ''
-ms.config_mail_server = ''
-ms.config_mail_to     = '' # use a list for multiple recipients
+ms.url = 'http://www.der-meridian.de/strecken-fahrplaene/linie/1-munchen-hbf-rosenheim-salzburg-hbf'
 
+ma = MeridianAnnoucement()
+
+# run main loop
 loop()
