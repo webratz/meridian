@@ -14,3 +14,16 @@ line = 1
 api_key = "CHANGEME"
 # create a channel to which the notifications should be sent, others can subscribe
 channel = "CHANGEME"
+
+[twitter]
+# twitter application settings
+consumer_key = ""
+consumer_secret = ""
+access_token_key = ""
+access_token_secret = ""
+
+[maillogger]
+# send errors via mail
+mailhost = ""
+fromaddr = ""
+toaddr = ""

@@ -12,10 +12,15 @@ import requests
 from datetime import datetime
 import sys
 import logging
+from logging import handlers
 import hashlib
 from pushbullet import Pushbullet
 import pickle
 import toml
+import twitter
+
+# work around warnings in older python 2.7 versions
+logging.captureWarnings(True)
 
 with open("meridian.toml") as conffile:
     config = toml.loads(conffile.read())
@@ -23,17 +28,19 @@ with open("meridian.toml") as conffile:
 # concact some variables
 MERIDIAN_INTERRUPTION_URL = "%s%s%s" % (config['meridian']['base_url'], config['meridian']['interruption_url_suffix'], config['meridian']['line'])
 
-# intialize PushBullet API
-pb = Pushbullet(config['pushbullet']['api_key'])
-
 # set up the logger
 logger = logging.getLogger('meridian')
 logger.setLevel(logging.INFO)
 
-# otput logs to stderr
+# output logs to stderr
 ch = logging.StreamHandler()
 ch.setLevel(logging.WARNING)
 logger.addHandler(ch)
+
+# mail errors to my owner
+mailh = handlers.SMTPHandler(config['maillogger']['mailhost'], config['maillogger']['fromaddr'], config['maillogger']['toaddr'], 'Meridian Maillogger Error')
+mailh.setLevel(logging.ERROR)
+logger.addHandler(mailh)
 
 class MeridianInterruption(object):
     """
@@ -60,6 +67,8 @@ class MeridianInterruption(object):
         """
         send a notification to a push bullet channel
         """
+        # intialize PushBullet API
+        pb = Pushbullet(config['pushbullet']['api_key'])
 
         text = """%s bis %s
 
@@ -75,6 +84,25 @@ Links:
             if config['pushbullet']['channel'] in channel.name:
                 channel.push_note(self.headline, text)
         return text
+
+    def twitter(self):
+        twapi = twitter.Api(consumer_key=config['twitter']['consumer_key'],
+                  consumer_secret=config['twitter']['consumer_secret'],
+                  access_token_key=config['twitter']['access_token_key'],
+                  access_token_secret=config['twitter']['access_token_secret'])
+
+        if len(self.headline) > 120:
+            logger.info('truncating twitter message')
+            text = "%s ..." % (self.headline[:117])
+        else:
+            text = self.headline
+
+        message = "%s - %s" % (text, MERIDIAN_INTERRUPTION_URL)
+        try:
+            loggger.info("sent twitter message for id %s", self.id)
+            twapi.PostUpdate(message)
+        except:
+            logger.error("Could not post twitter message %s", message)
 
 
 # scrape the hell out of the website
@@ -182,9 +210,13 @@ def run():
 
     for i in mip.interruptions:
         if i.id not in already_notified:
-            i.pushbullet() # send notification
+            # send notifications
+            i.pushbullet()
+            i.twitter()
             logger.info('Sent notification for id %s', i.id)
             already_notified.append(i.id)
+        logger.info('NOT sending a notification for id %s', i.id)
+
 
     # store the list of notified itmes back to disk
     try:
