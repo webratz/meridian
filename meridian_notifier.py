@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 import requests
 from datetime import datetime
 import sys
+import os
 import logging
 from logging import handlers
 import hashlib
@@ -22,7 +23,11 @@ import twitter
 # work around warnings in older python 2.7 versions
 logging.captureWarnings(True)
 
-with open("meridian.toml") as conffile:
+CONFDIR = os.environ['HOME'] + "/.meridian"
+if not os.path.exists(CONFDIR):
+    os.makedirs(CONFDIR)
+
+with open(CONFDIR + "/meridian.toml") as conffile:
     config = toml.loads(conffile.read())
 
 # concact some variables
@@ -89,20 +94,15 @@ Links:
         twapi = twitter.Api(consumer_key=config['twitter']['consumer_key'],
                   consumer_secret=config['twitter']['consumer_secret'],
                   access_token_key=config['twitter']['access_token_key'],
-                  access_token_secret=config['twitter']['access_token_secret'])
+                  access_token_secret=config['twitter']['access_token_secret'],
+                  input_encoding='utf8')
 
-        if len(self.headline) > 120:
-            logger.info('truncating twitter message')
-            text = "%s ..." % (self.headline[:117])
-        else:
-            text = self.headline
-
-        message = "%s - %s" % (text, MERIDIAN_INTERRUPTION_URL)
+        message = "%s: %s - %s" % (self.category, self.headline, MERIDIAN_INTERRUPTION_URL)
         try:
-            loggger.info("sent twitter message for id %s", self.id)
-            twapi.PostUpdate(message)
-        except:
-            logger.error("Could not post twitter message %s", message)
+            logger.info("sent twitter message for id %s", self.id)
+            twapi.PostUpdates(status=message)
+        except Exception as e:
+            logger.error("Could not post twitter message for id %s %s", self.id, e)
 
 
 # scrape the hell out of the website
@@ -202,7 +202,7 @@ def run():
 
     # load a file to check what we already have notified
     try:
-        already_notified = pickle.load(open("notify_store.bin", "rb"))
+        already_notified = pickle.load(open(CONFDIR + "/notify_store.bin", "rb"))
     except IOError:
         logger.warning('Could not load already_notified list. Starting with an empty list')
         already_notified = []
@@ -220,7 +220,7 @@ def run():
 
     # store the list of notified itmes back to disk
     try:
-        pickle.dump(already_notified, open("notify_store.bin", "wb"))
+        pickle.dump(already_notified, open(CONFDIR + "/notify_store.bin", "wb"))
     except IOError:
         logger.warning('Could not save already_notified list')
 
