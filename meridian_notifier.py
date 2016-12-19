@@ -122,9 +122,14 @@ class MeridianInterruptionPage(object):
             r = requests.get(self.url)
             if r.status_code == requests.codes.ok: # pylint: disable=E1101
                 soup = BeautifulSoup(r.text)
-                basehtml = soup.findAll('ul', class_='mod-interruption-list')[0]
-                self.basehtml = basehtml
-                return basehtml
+                try:
+                    basehtml = soup.findAll('ul', class_='mod-interruption-list')[0]
+                    self.basehtml = basehtml
+                    return basehtml
+                except IndexError:
+                    if len(soup.findAll('h3', class_='ok')) >=1:
+                        logger.info('currently everything seems to be ok, no interuptions to parse')
+                        sys.exit(0)
             else:
                 return None
         except requests.exceptions.RequestException as e:
@@ -147,13 +152,13 @@ class MeridianInterruptionPage(object):
             if 'bis' in timeframe:
                 startstring, endstring = timeframe.split('-')
                 start = datetime.strptime(startstring.strip(), "%d.%m.%y ab %H:%M")
-                end = datetime.strptime(endstring.strip(), "%d.%m.%y bis %H:%M")
+                end = datetime.strptime(endstring.strip(), "bis %H:%M")
             else:
                 start = datetime.strptime(timeframe.strip(), "%d.%m.%y ab %H:%M")
                 end = start
 
-        except:
-            logger.error('Could not parse the date of the interruption')
+        except Exception as e:
+            #logger.error('Could not parse the date of the interruption %s – %s', timeframe, e)
             start = None
             end = None
 
@@ -212,7 +217,7 @@ def run():
         if i.id not in already_notified:
             # send notifications
             i.pushbullet()
-            i.twitter()
+            #i.twitter()
             logger.info('Sent notification for id %s', i.id)
             already_notified.append(i.id)
         logger.info('NOT sending a notification for id %s', i.id)
