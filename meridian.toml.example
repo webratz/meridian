@@ -1,0 +1,31 @@
+# meridian.toml
+[meridian]
+base_url = "http://www.der-meridian.de"
+interruption_url_suffix = "/strecken-fahrplaene/fahrplanabweichungen?line="
+# ID of the train line you want notifications for. Find it out via the Meridian Website
+# Currently the IDs are:
+# 1: München Hbf - Rosenheim - Salzburg Hbf
+# 2: München Hbf - Rosenheim - Kufstein
+# 3: München Hbf - Holzkirchen - Rosenheim
+line = 1
+
+[pushbullet]
+# go to https://www.pushbullet.com/ register and get your API key
+api_key = "CHANGEME"
+# create a channel to which the notifications should be sent, others can subscribe
+channel = "CHANGEME"
+# channel for detailed delay messages from BEG
+delaychannel = "CHANGEME"
+
+[twitter]
+# twitter application settings
+consumer_key = ""
+consumer_secret = ""
+access_token_key = ""
+access_token_secret = ""
+
+[maillogger]
+# send errors via mail
+mailhost = ""
+fromaddr = ""
+toaddr = ""
