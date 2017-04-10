@@ -14,6 +14,8 @@ line = 1
 api_key = "CHANGEME"
 # create a channel to which the notifications should be sent, others can subscribe
 channel = "CHANGEME"
+# channel for detailed delay messages from BEG
+delaychannel = "CHANGEME"
 
 [twitter]
 # twitter application settings

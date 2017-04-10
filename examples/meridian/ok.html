@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]> <html class="ie ie6" lang="de"> <![endif]-->
+<!--[if IE 7 ]> <html class="ie ie7" lang="de"> <![endif]-->
+<!--[if IE 8 ]> <html class="ie ie8" lang="de"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--> <html class="gt-ie9" lang="de"> <!--<![endif]-->
+<head>
+<!-- Gestaltung und Realisierung - Digramm Media GmbH -->
+<meta charset='utf-8'>
+<meta content='width=device-width, initial-scale=1, maximum-scale=1' name='viewport'>
+
+
+
+<title>Fahrplanabweichungen - Meridian</title>
+<link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,700,300,400italic' rel='stylesheet' type='text/css'>
+
+<link href="/assets/veolia_base/application_default-6e743eacbac5c0097b27feb673f61a96.css" media="all" rel="stylesheet" type="text/css" />
+<script src='//maps.googleapis.com/maps/api/js?v=3.exp&amp;sensor=true' type='text/javascript'></script>
+<script src="/assets/veolia_base/application-b9d2e05e97359aadf1b5e499d6b1c21d.js" type="text/javascript"></script>
+<!--[if lt IE 9]>
+<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<link href='/assets/veolia_base/favicon/default/favicon-c63eba12318a6bb9cb59705f5159b894.ico' rel='shortcut icon'>
+<link href='/assets/veolia_base/favicon/default/apple-touch-icon-deffd2be9b6c3cd87e73d3c4273c7881.png' rel='apple-touch-icon'>
+<link href='/assets/veolia_base/favicon/default/apple-touch-icon-72x72-94ac876f33d90b4459957434b04ff129.png' rel='apple-touch-icon' sizes='72x72'>
+<link href='/assets/veolia_base/favicon/default/apple-touch-icon-114x114-ec6cb669c726d36ed69311c4288eb819.png' rel='apple-touch-icon' sizes='114x114'>
+<link href='/assets/veolia_base/favicon/default/apple-touch-icon-144x144-25b04e396d7d2f9cccfb338c2e258f85.png' rel='apple-touch-icon' sizes='144x144'>
+<meta content="authenticity_token" name="csrf-param" />
+<meta content="FZ42b/yIMQvGgUQzIVGWr2jUoDP2rs3zpOcLUlh7gm0=" name="csrf-token" />
+</head>
+<body class='c-interruptions a-index' data-env='production' data-tenant='meridian'>
+<!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-7MJBZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-7MJBZ');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager dataLayer -->
+<script>
+  dataLayer.push({"pageTitle":"Fahrplanabweichungen - Meridian","pageID":12,"pageUrl":"/strecken-fahrplaene/fahrplanabweichungen?line=1","pageCanonical":"/strecken-fahrplaene/fahrplanabweichungen","pageCallDate":"16-12-21","pageCallTime":"08:21:41","pageRevisionDate":"16-12-07T10:27:29","pageRevisionNr":"","pageEnviroment":"production"});
+</script>
+<!-- End Google Tag Manager dataLayer -->
+
+<div class='logo-nav-holder'>
+<a class='skip navigation' href='#navigation' title='Zur Navigation'>Zur Navigation</a>
+<a class='skip content' href='#content' title='Zum Seiteninhalt'>Zum Seiteninhalt</a>
+<a class='skip search' href='#quick-search' title='Zum Seiteninhalt'>Zur Seitensuche</a>
+<button id='nav-controller'></button>
+<div class='logo-nav'>
+<a href="/" class="logo"><img alt="Logo" src="/uploads/meridian/logo.png" /></a>
+<nav class='main_nav'>
+<ul class='cf main_nav__list--level-0' id='navigation'>
+<li class='main_nav__item--level-0'>
+<a class='active has-sub-menu' href='#'>
+<strong>Strecken</strong>
+<span class='hide-for-small'>Linien &amp; Fahrpläne</span>
+<button class='opener' type='button'>
+<span class='visuallyhidden'>Unternavigation schließen / öffnen</span>
+</button>
+</a>
+<ul class='main_nav__list--level-1'>
+<li class='main_nav__item--level-1'>
+<a href="/strecken-fahrplaene/linien-uebersicht" class="main_nav__link--level-1" title="Linien-Übersicht">Linien-Übersicht</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/strecken-fahrplaene/fahrplaene" class="main_nav__link--level-1" title="Fahrpläne">Fahrpläne</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/strecken-fahrplaene/fahrplanabweichungen" class="main_nav__link--level-1" title="Fahrplanabweichungen">Fahrplanabweichungen</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/strecken-fahrplaene/baustellenvorankundigung-2017" class="main_nav__link--level-1" title="Baustellenvorankündigung 2017">Baustellenvorankündigung 2017</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/strecken-fahrplaene/sev-haltestellen" class="main_nav__link--level-1" title="SEV-Haltestellenpläne ">SEV-Haltestellenpläne</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/strecken-fahrplaene/streckennetz" class="main_nav__link--level-1" title="Streckennetz">Streckennetz</a>
+</li>
+</ul>
+</li>
+<li class='main_nav__item--level-0'>
+<a class='has-sub-menu' href='#'>
+<strong>Fahrkarten</strong>
+<span class='hide-for-small'>Tarife &amp; Angebote</span>
+<button class='opener' type='button'>
+<span class='visuallyhidden'>Unternavigation schließen / öffnen</span>
+</button>
+</a>
+<ul class='main_nav__list--level-1'>
+<li class='main_nav__item--level-1'>
+<a href="/fahrkarten/fahrkarten-und-tarife" class="main_nav__link--level-1" title="Welche Karte passt zu Ihnen?">Alle Fahrkarten auf einen Blick</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/fahrkarten/einzelfahrkarten" class="main_nav__link--level-1" title="Einzelfahrkarten">Einzelfahrkarten &amp; Kurzstrecken</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/fahrkarten/tageskarten" class="main_nav__link--level-1" title="Tageskarten">Tageskarten</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/fahrkarten/das-guten-tag-ticket" class="main_nav__link--level-1" title="Das Guten Tag Ticket">Das Guten Tag Ticket</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/fahrkarten/zeitkarten-abos" class="main_nav__link--level-1" title="Zeitkarten &amp; Abos">Zeitkarten &amp; Abos</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/fahrkarten/die-muenchen-citytourcard" class="main_nav__link--level-1" title="München CityTourCard">München CityTourCard</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/fahrkarten/mvv-semesterticket" class="main_nav__link--level-1" title="MVV Semesterticket">MVV Semesterticket</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/fahrkarten/rad-hund" class="main_nav__link--level-1" title="Rad &amp; Hund">Rad &amp; Hund</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/fahrkarten/klassen-gruppenreisen-mit-dem-meridian" class="main_nav__link--level-1" title="Klassen-/Gruppenreisen mit dem Meridian">Klassen-/Gruppenreisen</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/fahrkarten/mit-westbahn-und-obb-nach-osterreich" class="main_nav__link--level-1" title="Mit WESTbahn und ÖBB nach Österreich">Mit WESTbahn und ÖBB nach Österreich</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/fahrkarten/tarifbestimmungen" class="main_nav__link--level-1" title="Tarifbestimmungen &amp; Beförderungsbedingungen">Tarifbestimmungen &amp; Beförderungsbedingungen</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="https://tickets.der-meridian.de" class="main_nav__link--level-1" title="Ticket-Webshop">Ticket-Webshop</a>
+</li>
+</ul>
+</li>
+<li class='main_nav__item--level-0'>
+<a class='has-sub-menu' href='#'>
+<strong>Reisen</strong>
+<span class='hide-for-small'>Ziele &amp; Specials</span>
+<button class='opener' type='button'>
+<span class='visuallyhidden'>Unternavigation schließen / öffnen</span>
+</button>
+</a>
+<ul class='main_nav__list--level-1'>
+<li class='main_nav__item--level-1'>
+<a href="/reisen/Vorteilspartner" class="main_nav__link--level-1" title="Mit dem Meridian reisen und sparen">Vorteilspartner</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/reisen/ausflugtipps" class="main_nav__link--level-1" title="Ausflugtipps">Ausflugtipps</a>
+</li>
+</ul>
+</li>
+<li class='main_nav__item--level-0'>
+<a class='has-sub-menu' href='#'>
+<strong>Service</strong>
+<span class='hide-for-small'>Fragen &amp; Antworten</span>
+<button class='opener' type='button'>
+<span class='visuallyhidden'>Unternavigation schließen / öffnen</span>
+</button>
+</a>
+<ul class='main_nav__list--level-1'>
+<li class='main_nav__item--level-1'>
+<a href="/service/verkaufsstellen" class="main_nav__link--level-1" title="Verkaufsstellen">Verkaufsstellen</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/service/fahrgastrechte-und-kundengarantien" class="main_nav__link--level-1" title="Fahrgastrechte und Kundengarantien ">Fahrgastrechte und Kundengarantien </a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/service/barrierefrei-reisen" class="main_nav__link--level-1" title="Barrierefrei Reisen ">Barrierefrei Reisen</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/service/downloads" class="main_nav__link--level-1" title="Downloads">Downloads</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/service/fragen-und-antworten-faq" class="main_nav__link--level-1" title="Fragen und Antworten (FAQ)">Fragen und Antworten (FAQ)</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/service/stationsformular" class="main_nav__link--level-1" title="Stationsformular">Stationsformular</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/service/so-stimmt-s-richtiges-verhalten-im-zug" class="main_nav__link--level-1" title="So stimmt´s - richtiges Verhalten im Zug">So stimmt´s - richtiges Verhalten im Zug</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/service/eisenbahner-mit-herz" class="main_nav__link--level-1" title="Eisenbahner mit Herz 2017 gesucht">Eisenbahner mit Herz 2017</a>
+</li>
+</ul>
+</li>
+<li class='main_nav__item--level-0'>
+<a class='has-sub-menu' href='#'>
+<strong>Über uns</strong>
+<span class='hide-for-small'>Das Unternehmen</span>
+<button class='opener' type='button'>
+<span class='visuallyhidden'>Unternavigation schließen / öffnen</span>
+</button>
+</a>
+<ul class='main_nav__list--level-1'>
+<li class='main_nav__item--level-1'>
+<a href="/ueber-uns/mobil-im-herzen-bayerns" class="main_nav__link--level-1" title="Mobil im Herzen Bayerns ...">Mobil im Herzen Bayerns</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/ueber-uns/stellenanzeigen" class="main_nav__link--level-1" title="Stellenanzeigen">Stellenanzeigen</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/ueber-uns/zahlen-daten-wissenswertes" class="main_nav__link--level-1" title="Zahlen, Daten, Wissenswertes">Zahlen, Daten, Wissenswertes</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/ueber-uns/presse" class="main_nav__link--level-1" title="Presse">Presse</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/ueber-uns/aktuelle-nachrichten" class="main_nav__link--level-1" title="Aktuelle Nachrichten">Aktuelle Nachrichten</a>
+</li>
+<li class='main_nav__item--level-1'>
+<a href="/ueber-uns/die-bayerische-eisenbahngesellschaft-beg" class="main_nav__link--level-1" title="Die Bayerische Eisenbahngesellschaft (BEG)">Die Bayerische Eisenbahngesellschaft (BEG)</a>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class='search-holder jsb_ jsb_search'>
+<a class='search-icon' href='#' title='Suche'></a>
+<div class='search-overlay'>
+<form accept-charset="UTF-8" action="/suche" autocomplete="off" id="quick-search" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
+<input id="query" name="query" placeholder="Suchbegriff" title="Suchbegriff eingeben" type="text" />
+<input title="Suche abschicken" type="submit" value="Suche" />
+</form>
+
+</div>
+</div>
+
+</div>
+</div>
+
+<div class='stage-rp-wrapper'>
+<div class='category-image'>
+<img alt="S1200x250" src="/uploads/meridian/page/12/s1200x250.jpg" />
+</div>
+</div>
+
+<div id='content'>
+<div class='area'>
+<div class='row'>
+<div class='six columns'>
+<h1>Fahrplanabweichungen</h1>
+<select class='jsb_ jsb_SelectOrDie' data-links='true'>
+<option value='/strecken-fahrplaene/fahrplanabweichungen'>Alle Linien anzeigen</option>
+<option value="/strecken-fahrplaene/fahrplanabweichungen?line=1" selected="selected">München Hbf - Rosenheim - Salzburg Hbf</option>
+<option value="/strecken-fahrplaene/fahrplanabweichungen?line=2">München Hbf - Rosenheim - Kufstein</option>
+<option value="/strecken-fahrplaene/fahrplanabweichungen?line=3">München Hbf - Holzkirchen - Rosenheim</option>
+</select>
+<h3 class='ok'>Keine Fahrplanabweichungen</h3>
+</div>
+<div class='three columns'>
+<div class='sidebar'>
+
+<ul class='nav'>
+<li>
+<a href="/strecken-fahrplaene/linien-uebersicht">Linien-Übersicht</a>
+
+</li>
+<li>
+<a href="/strecken-fahrplaene/fahrplaene">Fahrpläne</a>
+
+</li>
+<li class='active'>
+<a href="/strecken-fahrplaene/fahrplanabweichungen">Fahrplanabweichungen</a>
+
+</li>
+<li>
+<a href="/strecken-fahrplaene/baustellenvorankundigung-2017">Baustellenvorankündigung 2017</a>
+
+</li>
+<li>
+<a href="/strecken-fahrplaene/sev-haltestellen">SEV-Haltestellenpläne</a>
+
+</li>
+<li>
+<a href="/strecken-fahrplaene/streckennetz">Streckennetz</a>
+
+</li>
+</ul>
+
+<div class='teaser'>
+<h4>Fahrplan in Echtzeit</h4>
+
+<p>Informieren Sie sich in der Fahrplanauskunft der Bayerischen Eisenbahngesellschaft (BEG) jederzeit über unsere aktuelle Pünktlichkeit:</p>
+
+
+<ul class='links'>
+<li>
+<a href="http://www.bayern-fahrplan.de">www.bayern-fahrplan.de</a>
+</li>
+</ul>
+</div>
+
+<div class='teaser'>
+<h4>Baustellenvorankündigung</h4>
+
+<p>Eine Übersicht der zurzeit bekannten Baumaßnahmen haben wir hier für Sie zusammengefasst:</p>
+
+<ul class='links'>
+<li>
+<a href="/strecken-fahrplaene/baustellenvorankundigung-2016">Übersicht Baumaßnahmen</a>
+</li>
+</ul>
+</div>
+
+<div class='teaser'>
+<h4>Frequently Asked Questions</h4>
+
+<p>Antworten auf die meistgestellten Fragen zum Meridian</p>
+
+<ul class='links'>
+<li>
+<a href="/service/fragen-und-antworten-faq">Zu den FAQs</a>
+</li>
+</ul>
+</div>
+
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<ul class='social hide-for-small'>
+</ul>
+
+<footer>
+<div class='row'>
+<div class='two columns'>
+<a href="/" class=""><img alt="Logo_bw" class="logo" src="/uploads/meridian/logo_bw.png" /></a>
+</div>
+<div class='three columns border-left'>
+<p>Bayerische Oberlandbahn GmbH
+<br />Bahnhofplatz 9
+<br />83607 Holzkirchen
+<br />Telefon: 08024 / 99 71 71 
+<br />Telefax: 08024 / 99 71 10 
+</p>
+</div>
+<div class='two columns'>
+<ul>
+<li>
+<a href='/befoerderungsbedingungen' title='Beförderungsbedingungen'>Beförderungsbedingungen</a>
+</li>
+<li>
+<a href='/agb' title='AGB Internetverkauf'>AGB Internetverkauf</a>
+</li>
+<li>
+<a href='/datenschutz' title='Datenschutz'>Datenschutz</a>
+</li>
+<li>
+<a href='/impressum' title='Impressum'>Impressum</a>
+</li>
+<li>
+<a href='/kontakt' title='Kontakt'>Kontakt</a>
+</li>
+</ul>
+
+</div>
+<div class='two columns'>
+<ul>
+<li>
+<a href='http://www.transdev.de' title='Transdev Deutschland'>Transdev Deutschland</a>
+</li>
+<li>
+<a href='http://www.transdev.com' title='Transdev weltweit'>Transdev weltweit</a>
+</li>
+</ul>
+
+</div>
+<div class='one columns hide-for-small'>
+<ul>
+<li class='print'>
+<a href='javascript:window.print()' title='Drucken'>Drucken</a>
+</li>
+</ul>
+</div>
+</div>
+</footer>
+
+<a class='go-to-top' href='#' title='Zurück zum Seitenanfang'></a>
+</body>
