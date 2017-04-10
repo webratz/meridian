@@ -7,7 +7,6 @@
 #
 # Copyright (c) 2016 Andreas Sieferlinger
 
-from bs4 import BeautifulSoup
 import requests
 from datetime import datetime
 import sys
@@ -19,6 +18,8 @@ from pushbullet import Pushbullet
 import pickle
 import toml
 import twitter
+import pprint
+import iso8601
 
 # work around warnings in older python 2.7 versions
 logging.captureWarnings(True)
@@ -29,9 +30,6 @@ if not os.path.exists(CONFDIR):
 
 with open(CONFDIR + "/meridian.toml") as conffile:
     config = toml.loads(conffile.read())
-
-# concact some variables
-MERIDIAN_INTERRUPTION_URL = "%s%s%s" % (config['meridian']['base_url'], config['meridian']['interruption_url_suffix'], config['meridian']['line'])
 
 # set up the logger
 logger = logging.getLogger('meridian')
@@ -47,18 +45,19 @@ mailh = handlers.SMTPHandler(config['maillogger']['mailhost'], config['maillogge
 mailh.setLevel(logging.ERROR)
 logger.addHandler(mailh)
 
+
 class MeridianInterruption(object):
     """
     Abstract object of an Interruption
     """
-    def __init__(self, headline, content, start, end, category, urls=None):
+    def __init__(self, headline, content, start, end, category, mid):
         self.headline = headline
         self.content = content
         self.start = start
         self.end = end
         self.category = category
-        self.urls = urls
         self.id = self.compute_id()
+        self.mid = mid  # Meridian ID
 
 
     def compute_id(self):
@@ -66,7 +65,7 @@ class MeridianInterruption(object):
         calculcate an hash over the text
         id changes with every content change, so that we send and renotification
         """
-        return hashlib.sha256(str(self.content)).hexdigest()
+        return hashlib.sha256(self.content.encode('utf-8')).hexdigest()
 
     def pushbullet(self):
         """
@@ -81,8 +80,7 @@ class MeridianInterruption(object):
 
 Kategorie: %s
 Links:
-%s
-        """ % (self.start, self.end, self.content.text, self.category, '\n'.join(self.urls))
+        """ % (self.start, self.end, self.content, self.category)
 
 
         for channel in pb.channels:
@@ -107,96 +105,39 @@ Links:
 
 # scrape the hell out of the website
 class MeridianInterruptionPage(object):
-    def __init__(self, url=MERIDIAN_INTERRUPTION_URL):
+    def __init__(self, url='http://www.meridian-bob-brb.de/de/baustellen.json'):
         self.url = url
-        self.basehtml = None
+        self.interruptions = []
+        self.data = self.get_data()
+        self.parse_data()
 
-        self.get_interruptions_base_html()
-        self.interruptions = self.get_interruptions()
-
-    def get_interruptions_base_html(self):
+    def get_data(self):
         """
-        get the interesting html part of the website
+        get json
         """
         try:
             r = requests.get(self.url)
             if r.status_code == requests.codes.ok: # pylint: disable=E1101
-                soup = BeautifulSoup(r.text)
-                try:
-                    basehtml = soup.findAll('ul', class_='mod-interruption-list')[0]
-                    self.basehtml = basehtml
-                    return basehtml
-                except IndexError:
-                    if len(soup.findAll('h3', class_='ok')) >=1:
-                        logger.info('currently everything seems to be ok, no interuptions to parse')
-                        sys.exit(0)
-            else:
-                return None
+                return r.json()
+
         except requests.exceptions.RequestException as e:
-            logger.error('Could not parse the base html')
+            logger.error('Could not load the the json')
             logger.error(e)
             sys.exit(1)
 
-    def parse_interruption_item(self, html):
-        """
-        try to get some useful data out of the html
-        """
-        try:
-            category = html.find('div', class_='mod-interruption-list__header-title').text.strip('\n')
-        except:
-            logger.error('Could not parse the category')
-            category = None
-
-        try:
-            timeframe = html.find('div', class_='mod-interruption-list__header-date').text
-            if 'bis' in timeframe:
-                startstring, endstring = timeframe.split('-')
-                start = datetime.strptime(startstring.strip(), "%d.%m.%y ab %H:%M")
-                end = datetime.strptime(endstring.strip(), "bis %H:%M")
-            else:
-                start = datetime.strptime(timeframe.strip(), "%d.%m.%y ab %H:%M")
-                end = start
-
-        except Exception as e:
-            #logger.error('Could not parse the date of the interruption %s – %s', timeframe, e)
-            start = None
-            end = None
-
-        try:
-            headline = html.find('div', class_='mod-interruption-list__headline').text.strip()
-        except:
-            logger.error('Could not parse the headline')
-            headline = None
-
-        try:
-            content = html.find('div', class_='mod-interription-list__description')
-        except:
-            logger.error('Could not parse the content of the interruption')
-            content = None
+    def parse_data(self):
+        for element in self.data['current']: #  TODO: add also upcoming
+            headline = element['title']
+            content = element['body']
+            category = element['category']
+            start = iso8601.parse_date(element['starts_at'])
+            end = iso8601.parse_date(element['ends_at'])
+            mid = element['id']
+            if 1 in element['line_ids']:
+                # print element['id'], headline
+                self.interruptions.append(MeridianInterruption(headline, content, start, end, category, mid))
 
 
-        try:
-            urls = []
-            for i in html.findAll('a', class_='mod-download-list__link', href=True):
-                urls.append("%s%s" % (config['meridian']['base_url'], i['href']))
-        except:
-            logger.info('Did not find any URLS')
-            urls = []
-
-
-        # create a new Interruption object
-        interruption = MeridianInterruption(headline, content, start, end, category, urls)
-        return interruption
-
-    def get_interruptions(self):
-        """
-        get a lst of interruptions on the website
-        """
-        irupts = []
-        for item in self.basehtml.findAll('li', class_='mod-interruption-list__item'):
-            interruption = self.parse_interruption_item(item)
-            irupts.append(interruption)
-        return irupts
 
 
 def run():
@@ -230,3 +171,5 @@ def run():
         logger.warning('Could not save already_notified list')
 
 run()
+
+m = MeridianInterruptionPage()
