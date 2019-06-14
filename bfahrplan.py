@@ -29,7 +29,7 @@ CONFDIR = os.environ['HOME'] + "/.meridian"
 if not os.path.exists(CONFDIR):
     os.makedirs(CONFDIR)
 
-with open(CONFDIR + "/meridian.toml") as conffile:
+with open(CONFDIR + "/beg.toml") as conffile:
     config = toml.loads(conffile.read())
 
 # set up the logger
@@ -41,9 +41,10 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
-BASE_URL = 'http://www.bayern-fahrplan.de/jqm/beg_lite'
+BASE_URL = 'https://www.bayern-fahrplan.de/jqm/beg_lite'
 
 LOCATION_ROSENHEIM = 80000821
+LOCATION_GROSSKARO = 80000680
 LOCATION_MUNICH_EAST = 91000005
 LOCATION_MUNICH_MAIN = 91000100
 
@@ -54,7 +55,7 @@ def fetch_departure_data(locationid, loadFromFile=None):
     urlparams = {
         "convertStopsPTKernel2LocationServer": 1,
         "itOptionsActive": 1,
-        "limit": 40,
+        "limit": 20,
         "locationServerActive": 1,
         "mode": "direct",
         "name_dm": locationid, # ID of location we are searching things for
@@ -154,6 +155,11 @@ class BFNote(object):
         """
         does the note have a "normal" priority?
         """
+        # blacklist some notifications that could be in every train
+        if self.header:
+            if 'Bauarbeiten' in self.header or 'Fahrplanabweichung' in self.header:
+                return False
+
         if self.priority is not None:
             if 'veryLow' in self.priority:
                 return False
@@ -184,7 +190,7 @@ class BFDeparture(object):
                 except IndexError:
                     continue
                 except UnicodeEncodeError:
-                    print splitted
+                    print(splitted)
                     raise
 
         self.mode = data['mode']
@@ -202,7 +208,7 @@ class BFDeparture(object):
         try:
             self.delay = int(data['mode']['delay'])
         except KeyError:
-            self.delay = None
+            self.delay = 0
 
         self.notes = []
         if data['notes'] is not None:
@@ -223,7 +229,7 @@ class BFDeparture(object):
         id changes with every content change, so that we send an renotification
         """
         hashstr = "%s %s %s %s" % (self.number, self.depart_time, self.notetexts, self.delay)
-        did = hashlib.sha256(str(hashstr)).hexdigest()
+        did = hashlib.sha256(hashstr.encode('UTF8')).hexdigest()
         self.id = did
         return did
 
@@ -241,7 +247,9 @@ class BFDeparture(object):
         """
         we are only interested in a few "products" / "train types", so let's just work on them
         """
-        if self.train_type in ['Meridian', 'EuroCity', 'EC', 'IC', 'InterCity']:
+        full_list = ['Meridian', 'EuroCity', 'EC', 'IC', 'InterCity']
+        short_list = ['Meridian']
+        if self.train_type in short_list:
             return True
         else:
             return False
@@ -267,33 +275,27 @@ class BFDeparture(object):
         pb = Pushbullet(config['pushbullet']['api_key'])
 
         # print d.delay, d.depart_time, d.number, d.destination, d.platform, d.notetexts
-        text = u""" %s nach %s von %s
+        text = u""" %s nach %s von %s %s
 Abfahrt: %s
 Verspätung: %s Minuten
 Hinweise:
 %s
 
-        """ % (self.number, self.destination, self.platform, self.depart_time, self.delay, '\n'.join(self.notetexts))
+        """ % (self.number, self.destination, self.depart_from, self.platform, self.depart_time, self.delay, '\n'.join(self.notetexts))
         headline = u"%s nach %s" % (self.number, self.destination)
 
 
         for channel in pb.channels:
-            if config['pushbullet']['delaychannel'] in channel.name:
+            if config['pushbullet']['channel'] in channel.name:
                 channel.push_note(headline, text)
         return text
 
 
-
-
-
-
-
-
-def run():
+def run(departure_location, target_name):
     """
     actually glue everything together and run
     """
-    departure_data = fetch_departure_data(LOCATION_ROSENHEIM, loadFromFile=None)
+    departure_data = fetch_departure_data(departure_location, loadFromFile=None)
 
     # load a file to check what we already have notified
     try:
@@ -306,12 +308,13 @@ def run():
         #print pprint.pprint(departure)
         d = BFDeparture(departure)
         if d.id not in already_notified:
-            if d.stops_at(u'München') and d.interesting_train_type():
-                print d.delay, d.depart_time, d.number, d.destination, d.platform, ' '.join(d.notetexts)
+            if d.stops_at(target_name) and d.interesting_train_type():
+                # print(d.delay, d.depart_time, d.number, 'nach', d.destination, d.platform, ' '.join(d.notetexts))
                 if d.shall_we_notifiy():
-                    print d.delay, d.depart_time, d.number, d.destination, d.platform, ' '.join(d.notetexts)
+                    print('notification:')
+                    print(d.delay, d.depart_time, d.number, d.destination, d.platform, ' '.join(d.notetexts))
                     d.pushbullet()
-            already_notified.append(d.id)
+                    already_notified.append(d.id)
 
     # store the list of notified items back to disk
     try:
@@ -319,4 +322,5 @@ def run():
     except IOError as e:
         logger.warning('Could not save already_notified list %s', e)
 
-run()
+run(LOCATION_GROSSKARO, u'München')
+run(LOCATION_MUNICH_EAST, u'karolinenfeld')
