@@ -126,12 +126,15 @@ class MeridianInterruptionPage(object):
             sys.exit(1)
 
     def parse_data(self):
-        for element in self.data['current']: #  TODO: add also upcoming
+        for element in self.data.get('current'): #  TODO: add also upcoming
             headline = element['title']
             content = element['body']
             category = element['category']
             start = iso8601.parse_date(element['starts_at'])
-            end = iso8601.parse_date(element['ends_at'])
+            try:
+                end = iso8601.parse_date(element['ends_at'])
+            except iso8601.iso8601.ParseError:
+                end = None            
             mid = element['id']
             if 1 in element['line_ids']:
                 # print element['id'], headline
