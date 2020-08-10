@@ -19,6 +19,7 @@ import toml
 import twitter
 import pprint
 import iso8601
+import socket
 
 # work around warnings in older python 2.7 versions
 logging.captureWarnings(True)
@@ -155,8 +156,8 @@ def run():
     """
     try:
         mip = MeridianInterruptionPage()
-    except requests.exceptions.HTTPError:
-        print('could not fetch data')
+    except (requests.exceptions.HTTPError, socket.timeout):
+        # print('could not fetch data')
         sys.exit(1)
 
     # load a file to check what we already have notified
